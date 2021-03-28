@@ -3,7 +3,6 @@
 
 Cube::Cube(size_t ID)
 {
-    qDebug()<<"\n\nFock!!!\n\n";
     parts[0] = std::make_shared<Triangle>(Type::xDown, ID);
     parts[1] = std::make_shared<Triangle>(Type::xUp, ID);
     parts[2] = std::make_shared<Triangle>(Type::yDown, ID);

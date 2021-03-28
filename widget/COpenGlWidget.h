@@ -14,8 +14,6 @@
 
 #include <basics/Map.h>
 
-
-
 class COpenGlWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
 public:
@@ -51,6 +49,10 @@ private:
     QTimer* timer = nullptr;
 
     Map map;
+
+    //
+    QOpenGLBuffer *m_vbo = nullptr;
+    QOpenGLVertexArrayObject *m_vao = nullptr;
 
 
 };

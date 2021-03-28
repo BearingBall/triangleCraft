@@ -18,8 +18,4 @@ private:
     std::array<std::shared_ptr<Triangle>,6>parts;
 };
 
-
-
-
-
 #endif // CUBE_H

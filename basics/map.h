@@ -43,6 +43,7 @@ inline void Map::draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f)
                     getCube(i,j,k)->draw(m_program, f);
                 }
             }
+    m_program->release();
 }
 
 
