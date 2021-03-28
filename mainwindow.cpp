@@ -6,6 +6,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QSurfaceFormat format;
+    format.setSamples(16);
+    format.setVersion(3,3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    ui->openGLWidget->setFormat(format);
+    ui->openGLWidget->show();
 }
 
 MainWindow::~MainWindow()

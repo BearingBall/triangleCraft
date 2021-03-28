@@ -9,11 +9,20 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    basics/Cube.cpp \
+    basics/Triangle.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    widget/COpenGlWidget.cpp
 
 HEADERS += \
-    mainwindow.h
+    TextureContainer.h \
+    basics/Cube.h \
+    basics/Map.h \
+    basics/MeshShard.h \
+    basics/Triangle.h \
+    mainwindow.h \
+    widget/COpenGlWidget.h
 
 FORMS += \
     mainwindow.ui
@@ -22,3 +31,7 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    fsh.glsl \
+    vsh.glsl
