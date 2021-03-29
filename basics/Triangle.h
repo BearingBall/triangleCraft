@@ -26,6 +26,8 @@ public:
     Triangle(const Type& _type, size_t ID);
     ~Triangle() = default;
     void draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
+    void drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
+    void drawCalibratingTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f, QVector3D color);
 private:
     size_t triangleID;
     Type type;

@@ -10,9 +10,11 @@ public:
     Cube(const Type& type, size_t ID);
     ~Cube() = default;
 
-    void getTriangle(const Type& type);
+    std::shared_ptr<Triangle>* getTriangle(const Type& type);
     void setTriangle(const Type& type, size_t ID);
     void draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
+    void drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
+    void drawCalibratingTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
 private:
     std::array<int,3> index;
     std::array<std::shared_ptr<Triangle>,6>parts;

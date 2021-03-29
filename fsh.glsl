@@ -7,6 +7,5 @@ in vec2 textCoords;
 
 void main(void)
 {
-    //fragColor = texture(textureMap, textCoords);
-    fragColor = vec4(1,1,1,1);
+    fragColor = texture(textureMap, textCoords);
 }

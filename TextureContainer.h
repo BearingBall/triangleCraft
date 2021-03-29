@@ -22,6 +22,7 @@ private:
   TextureContainer()
   {
       textures.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\grass.jpg")));
+      textures.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\debug.jpg")));
 
       std::for_each(textures.begin(),textures.end(),[](std::shared_ptr<QOpenGLTexture>& current)
       {

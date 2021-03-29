@@ -8,23 +8,26 @@ Triangle::Triangle(const Type& _type, size_t ID)
     generateMesh();
     generateTextureCoods();
 
-    m_vao = new QOpenGLVertexArrayObject;
+    m_vao = new QOpenGLVertexArrayObject();
     if (m_vao->create())
         m_vao->bind();
-    m_vbo = new QOpenGLBuffer;
+
+    m_vbo = new QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
     m_vbo->create();
+    m_vbo->setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_vbo->bind();
+
+    m_vbo->allocate(mesh.data(), mesh.size()*sizeof(Shard));
 }
 
 void Triangle::draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f)
 {
-    m_vbo->allocate(mesh.data(), mesh.size()*sizeof(Shard));
+    m_vbo->bind();
+    m_vao->bind();
     m_program->enableAttributeArray("posAttr");
     m_program->setAttributeBuffer("posAttr", GL_FLOAT, offsetof(Shard, vertex), 3, sizeof(Shard));
     m_program->enableAttributeArray("textAttr");
     m_program->setAttributeBuffer("textAttr", GL_FLOAT, offsetof(Shard, textureCoord), 2, sizeof(Shard));
-    m_vbo->release();
-
 
     TextureContainer::Instance().textures[triangleID]->bind();
     m_program->setUniformValue("textureMap", 0);
@@ -32,7 +35,7 @@ void Triangle::draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f)
 
     f->glEnable(GL_DEPTH_TEST);
     f->glEnable(GL_POLYGON_OFFSET_FILL);
-    //f->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     f->glDrawArrays(GL_TRIANGLES, 0, 18);
 
     /*
@@ -45,6 +48,39 @@ void Triangle::draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f)
         glDrawArrays(GL_TRIANGLES, 0, vertexCounter);
     }
     */
+}
+
+void Triangle::drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions *f)
+{
+    m_vbo->bind();
+    m_vao->bind();
+    m_program->enableAttributeArray("posAttr");
+    m_program->setAttributeBuffer("posAttr", GL_FLOAT, offsetof(Shard, vertex), 3, sizeof(Shard));
+
+    f->glEnable(GL_DEPTH_TEST);
+    f->glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    f->glDrawArrays(GL_TRIANGLES, 0, 18);
+}
+
+void Triangle::drawCalibratingTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions *f, QVector3D color)
+{
+    m_vbo->bind();
+    m_vao->bind();
+    m_program->enableAttributeArray("posAttr");
+    m_program->setAttributeBuffer("posAttr", GL_FLOAT, offsetof(Shard, vertex), 3, sizeof(Shard));
+
+    f->glEnable(GL_DEPTH_TEST);
+    f->glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    for(size_t i=0;i<6;++i)
+    {
+        color.setY(static_cast<float>(i)/255);
+        m_program->setUniformValue("textAttr", color);
+        f->glDrawArrays(GL_TRIANGLES, i*3, 3);
+    }
+
 }
 
 void Triangle::generateMesh()
@@ -93,7 +129,7 @@ void Triangle::generateMesh()
         A = QVector3D(-0.5,-0.5,-0.5);
         B = QVector3D(-0.5,0.5,-0.5);
         C = QVector3D(0.5,0.5,-0.5);
-        D = QVector3D(-0.5,0.5,-0.5);
+        D = QVector3D(0.5,-0.5,-0.5);
         E = QVector3D(0,0,0);
     }
     if (type == Type::zUp)
@@ -101,7 +137,7 @@ void Triangle::generateMesh()
         A = QVector3D(-0.5,-0.5,0.5);
         B = QVector3D(-0.5,0.5,0.5);
         C = QVector3D(0.5,0.5,0.5);
-        D = QVector3D(-0.5,0.5,0.5);
+        D = QVector3D(0.5,-0.5,0.5);
         E = QVector3D(0,0,0);
     }
 
@@ -172,9 +208,9 @@ void Triangle::generateTextureCoods()
     if (type == Type::xDown)
     {
         mesh[0].setTextureCoord(QVector2D(0.0/512,256.0/384));
-        mesh[1].setTextureCoord(QVector2D(256.0/512,256.0/384));
-        mesh[2].setTextureCoord(QVector2D(256.0/512,128.0/384));
-        mesh[3].setTextureCoord(QVector2D(256.0/512,128.0/384));
+        mesh[1].setTextureCoord(QVector2D(128.0/512,256.0/384));
+        mesh[2].setTextureCoord(QVector2D(128.0/512,128.0/384));
+        mesh[3].setTextureCoord(QVector2D(128.0/512,128.0/384));
         mesh[4].setTextureCoord(QVector2D(0.0/512,128.0/384));
         mesh[5].setTextureCoord(QVector2D(0.0/512,256.0/384));
         mesh[6].setTextureCoord(QVector2D(256.0/512,(256.0+64.0)/384));

@@ -1,13 +1,13 @@
 #version 330
 
 in vec3 posAttr;
-in vec2 textAttr;
 
+uniform vec3 textAttr;
 uniform mat4 translate;
 uniform mat4 perspective;
 uniform mat4 view;
 
-out vec2 textCoords;
+out vec3 textCoords;
 
 void main()
 {

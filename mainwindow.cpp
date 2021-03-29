@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     QSurfaceFormat format;
-    format.setSamples(16);
+    //format.setSamples(16);
     format.setVersion(3,3);
     format.setProfile(QSurfaceFormat::CoreProfile);
     ui->openGLWidget->setFormat(format);

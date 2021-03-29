@@ -20,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     TextureContainer.h \
+    basics/Camera.h \
     basics/Cube.h \
     basics/Map.h \
     basics/MeshShard.h \
@@ -37,4 +38,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     fsh.glsl \
-    vsh.glsl
+    fshPicking.glsl \
+    vsh.glsl \
+    vshPicking.glsl
