@@ -22,6 +22,7 @@ HEADERS += \
     TextureContainer.h \
     basics/Camera.h \
     basics/Cube.h \
+    basics/DestroyBuildPointer.h \
     basics/Map.h \
     basics/MeshShard.h \
     basics/Triangle.h \

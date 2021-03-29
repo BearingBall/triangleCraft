@@ -1,6 +1,11 @@
 #include "Cube.h"
 #include "Triangle.h"
 
+Cube::Cube()
+{
+
+}
+
 Cube::Cube(size_t ID)
 {
     parts[0] = std::make_shared<Triangle>(Type::xDown, ID);

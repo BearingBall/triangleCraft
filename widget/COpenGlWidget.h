@@ -14,6 +14,7 @@
 #include <QCursor>
 
 #include "basics/Camera.h"
+#include "basics/DestroyBuildPointer.h"
 #include <basics/Map.h>
 
 class COpenGlWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -59,7 +60,7 @@ public:
     bool isCustomInitialized = false;
 
     bool keyProccess();
-    std::array<std::shared_ptr<Triangle>*,2> pickingBlock();
+    DestroyBuildPointer pickingBlock();
     void simpleDraw();
     void drawBlock(std::array<unsigned char,4> ID);
 

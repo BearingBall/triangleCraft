@@ -12,12 +12,12 @@
 #include <QVector3D>
 
 enum Type{
-    zUp,
-    zDown,
-    xUp,
     xDown,
+    xUp,
+    yDown,
     yUp,
-    yDown
+    zDown,
+    zUp
 };
 
 class Triangle final

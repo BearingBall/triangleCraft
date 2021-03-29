@@ -13,6 +13,7 @@ public:
     std::shared_ptr<Cube>& getCube(size_t ID);
     void draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
     void drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
+    bool isInRange(size_t x, size_t y, size_t z);
 private:
     std::array<size_t, 3> mapSize;
     std::vector<std::shared_ptr<Cube>> map;
@@ -74,6 +75,11 @@ inline void Map::drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunc
                  }
              }
      m_program->release();
+}
+
+inline bool Map::isInRange(size_t x, size_t y, size_t z)
+{
+    return (x<mapSize[0] && y<mapSize[1] && z<mapSize[2]);
 }
 
 

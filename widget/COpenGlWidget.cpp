@@ -39,6 +39,7 @@ void COpenGlWidget::customInit()
     map.getCube(1,5,2) = std::make_shared<Cube>(Type::zUp, 1);
     map.getCube(1,5,0) = std::make_shared<Cube>(Type::zDown, 1);
 
+    map.getCube(2,2,2) = std::make_shared<Cube>(0);
     map.getCube(1,0,0) = std::make_shared<Cube>(0);
     map.getCube(2,0,0) = std::make_shared<Cube>(0);
     map.getCube(3,0,0) = std::make_shared<Cube>(0);
@@ -69,17 +70,25 @@ bool COpenGlWidget::keyProccess()
     }
     if (mouse[Qt::MouseButton::LeftButton])
     {
-        std::array<std::shared_ptr<Triangle>*,2> tmp = pickingBlock();
-        if (tmp[0])
+        DestroyBuildPointer tmp = pickingBlock();
+        if (tmp.isDestroySeted)
         {
-            qDebug()<<"trying to destroy \n";
-            tmp[0]->reset();
+            (*tmp.destroy).reset();
             mouse[Qt::MouseButton::LeftButton] = false;
+        }
+    }
+    if (mouse[Qt::MouseButton::RightButton])
+    {
+        DestroyBuildPointer tmp = pickingBlock();
+        if (tmp.isBuildSeted)
+        {
+            (*tmp.build) = std::make_shared<Triangle>(tmp.buildType, 0);
+            mouse[Qt::MouseButton::RightButton] = false;
         }
     }
 }
 
-std::array<std::shared_ptr<Triangle>*,2> COpenGlWidget::pickingBlock()
+DestroyBuildPointer COpenGlWidget::pickingBlock()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     m_program_picking->bind();
@@ -115,11 +124,118 @@ std::array<std::shared_ptr<Triangle>*,2> COpenGlWidget::pickingBlock()
       glReadPixels(QCursor::pos().x(), QCursor::pos().y()-80,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data2.data());
       qDebug()<<data2[0]<<" "<<data2[1]<<"\n";
     }
-    std::array<std::shared_ptr<Triangle>*,2> destroyBuild;
+    DestroyBuildPointer destroyBuild;
     if (map.getCube(data[0],data[1],data[2]))
     {
-        destroyBuild[0] = map.getCube(data[0],data[1],data[2])->getTriangle(Type(data2[0]));
+        destroyBuild.destroy = map.getCube(data[0],data[1],data[2])->getTriangle(Type(data2[0]));
+        destroyBuild.isDestroySeted = true;
+
+        if ((data2[0] == 0 && data2[1] == 4)||(data2[0] == 1 && data2[1] == 4)||(data2[0] == 4 && data2[1] == 3)||(data2[0] == 5 && data2[1] == 3))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::yUp);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::yUp;
+        }
+        if ((data2[0] == 1 && data2[1] == 2)||(data2[0] == 0 && data2[1] == 2)||(data2[0] == 5 && data2[1] == 5)||(data2[0] == 4 && data2[1] == 5))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::yDown);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::yDown;
+        }
+        if ((data2[0] == 4 && data2[1] == 2)||(data2[0] == 5 && data2[1] == 2)||(data2[0] == 2 && data2[1] == 2)||(data2[0] == 3 && data2[1] == 2))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::xDown);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::xDown;
+        }
+        if ((data2[0] == 2 && data2[1] == 4)||(data2[0] == 3 && data2[1] == 4)||(data2[0] == 5 && data2[1] == 4)||(data2[0] == 4 && data2[1] == 4))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::xUp);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::xUp;
+        }
+        if ((data2[0] == 2 && data2[1] == 5)||(data2[0] == 1 && data2[1] == 5)||(data2[0] == 3 && data2[1] == 5)||(data2[0] == 0 && data2[1] == 5))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::zDown);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::zDown;
+        }
+        if ((data2[0] == 2 && data2[1] == 3)||(data2[0] == 3 && data2[1] == 3)||(data2[0] == 0 && data2[1] == 3)||(data2[0] == 1 && data2[1] == 3))
+        {
+             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::zUp);
+             destroyBuild.isBuildSeted = true;
+             destroyBuild.buildType = Type::zUp;
+        }
+
+        if (data2[0] == 0 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0]-1,data[1],data[2]))
+            {
+                if (!map.getCube(data[0]-1,data[1],data[2]))
+                    map.getCube(data[0]-1,data[1],data[2]) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::xUp;
+                destroyBuild.build = map.getCube(data[0]-1,data[1],data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+        if (data2[0] == 1 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0]+1,data[1],data[2]))
+            {
+                if (!map.getCube(data[0]+1,data[1],data[2]))
+                    map.getCube(data[0]+1,data[1],data[2]) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::xDown;
+                destroyBuild.build = map.getCube(data[0]+1,data[1],data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+        if (data2[0] == 2 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0],data[1]-1,data[2]))
+            {
+                if (!map.getCube(data[0],data[1]-1,data[2]))
+                    map.getCube(data[0],data[1]-1,data[2]) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::yUp;
+                destroyBuild.build = map.getCube(data[0],data[1]-1,data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+        if (data2[0] == 3 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0],data[1]+1,data[2]))
+            {
+                if (!map.getCube(data[0],data[1]+1,data[2]))
+                    map.getCube(data[0],data[1]+1,data[2]) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::yDown;
+                destroyBuild.build = map.getCube(data[0],data[1]+1,data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+        if (data2[0] == 4 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0],data[1],data[2]-1))
+            {
+                if (!map.getCube(data[0],data[1],data[2]-1))
+                    map.getCube(data[0],data[1],data[2]-1) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::zUp;
+                destroyBuild.build = map.getCube(data[0],data[1],data[2]-1)->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+        if (data2[0] == 5 && (data2[1] == 0 || data2[1] == 1))
+        {
+            if (map.isInRange(data[0],data[1],data[2]+1))
+            {
+                if (!map.getCube(data[0],data[1],data[2]+1))
+                    map.getCube(data[0],data[1],data[2]+1) = std::make_shared<Cube>();
+                destroyBuild.buildType = Type::zDown;
+                destroyBuild.build = map.getCube(data[0],data[1],data[2]+1)->getTriangle(destroyBuild.buildType);
+                destroyBuild.isBuildSeted = true;
+            }
+        }
+
     }
+
     return destroyBuild;
 }
 
