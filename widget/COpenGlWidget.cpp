@@ -32,22 +32,14 @@ void COpenGlWidget::customInit()
     m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "C:\\Users\\Public\\Documents\\triangleCraft\\fsh.glsl");
     m_program->link();
 
-    map.getCube(1,4,1) = std::make_shared<Cube>(Type::yDown, 1);
-    map.getCube(1,6,1) = std::make_shared<Cube>(Type::yUp, 1);
-    map.getCube(2,5,1) = std::make_shared<Cube>(Type::xUp, 1);
-    map.getCube(0,5,1) = std::make_shared<Cube>(Type::xDown, 1);
-    map.getCube(1,5,2) = std::make_shared<Cube>(Type::zUp, 1);
-    map.getCube(1,5,0) = std::make_shared<Cube>(Type::zDown, 1);
-
-    map.getCube(2,2,2) = std::make_shared<Cube>(0);
-    map.getCube(1,0,0) = std::make_shared<Cube>(0);
-    map.getCube(2,0,0) = std::make_shared<Cube>(0);
-    map.getCube(3,0,0) = std::make_shared<Cube>(0);
-    map.getCube(4,0,0) = std::make_shared<Cube>(0);
-    map.getCube(0,0,1) = std::make_shared<Cube>(0);
-    map.getCube(0,0,2) = std::make_shared<Cube>(0);
-    map.getCube(0,0,3) = std::make_shared<Cube>(0);
-    map.getCube(0,0,4) = std::make_shared<Cube>(0);
+    for(size_t i=0;i<10; ++i)
+    {
+        for(size_t j= 0; j< 10;++j)
+        {
+            map.getCube(i,0,j) = std::make_shared<Cube>(1);
+            map.getCube(i,1,j) = std::make_shared<Cube>(0);
+        }
+    }
 }
 
 bool COpenGlWidget::keyProccess()
