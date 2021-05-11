@@ -5,11 +5,11 @@ void COpenGlWidget::initializeGL()
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(1);
     initializeOpenGLFunctions();
+    customInit();
 }
 
 void COpenGlWidget::paintGL()
 {
-    customInit();
     keyProccess();
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     simpleDraw();
@@ -36,8 +36,8 @@ void COpenGlWidget::customInit()
     {
         for(size_t j= 0; j< 10;++j)
         {
-            map.getCube(i,0,j) = std::make_shared<Cube>(1);
-            map.getCube(i,1,j) = std::make_shared<Cube>(0);
+            map->getCube(i,0,j) = std::make_shared<Cube>(1);
+            map->getCube(i,1,j) = std::make_shared<Cube>(0);
         }
     }
 }
@@ -60,6 +60,14 @@ bool COpenGlWidget::keyProccess()
     {
         camera.step(0,0.1);
     }
+    if (keyBoard[Qt::Key::Key_Space])
+    {
+        camera.verticalStrafe(0.1);
+    }
+    if (keyBoard[17])
+    {
+        camera.verticalStrafe(-0.1);
+    }
     if (mouse[Qt::MouseButton::LeftButton])
     {
         DestroyBuildPointer tmp = pickingBlock();
@@ -74,7 +82,7 @@ bool COpenGlWidget::keyProccess()
         DestroyBuildPointer tmp = pickingBlock();
         if (tmp.isBuildSeted)
         {
-            (*tmp.build) = std::make_shared<Triangle>(tmp.buildType, 0);
+            (*tmp.build) = std::make_shared<Triangle>(tmp.buildType, gamebar->currentID());
             mouse[Qt::MouseButton::RightButton] = false;
         }
     }
@@ -86,7 +94,7 @@ DestroyBuildPointer COpenGlWidget::pickingBlock()
     m_program_picking->bind();
     m_program_picking->setUniformValue("perspective", camera.getPerspective());
     m_program_picking->setUniformValue("view", camera.getView());
-    map.drawWithoutTexture(m_program_picking,this);
+    map->drawWithoutTexture(m_program_picking,this);
     m_program->release();
     glFlush();
     glFinish();
@@ -98,10 +106,10 @@ DestroyBuildPointer COpenGlWidget::pickingBlock()
     data[2] -= 1;
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    qDebug()<<data[0]<<" "<<data[1]<<" "<<data[2]<<"\n";
+    //qDebug()<<data[0]<<" "<<data[1]<<" "<<data[2]<<"\n";
 
     std::array<unsigned char,4> data2;
-    if (map.getCube(data[0],data[1],data[2]))
+    if (map->getCube(data[0],data[1],data[2]))
     {
       m_program_picking->bind();
       m_program_picking->setUniformValue("perspective", camera.getPerspective());
@@ -109,119 +117,119 @@ DestroyBuildPointer COpenGlWidget::pickingBlock()
       QMatrix4x4 matrix;
       matrix.translate(data[0],data[1],data[2]);
       m_program_picking->setUniformValue("translate", matrix);
-      map.getCube(data[0],data[1],data[2])->drawCalibratingTexture(m_program_picking,this);
+      map->getCube(data[0],data[1],data[2])->drawCalibratingTexture(m_program_picking,this);
       glFlush();
       glFinish();
       glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
       glReadPixels(QCursor::pos().x(), QCursor::pos().y()-80,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data2.data());
-      qDebug()<<data2[0]<<" "<<data2[1]<<"\n";
+      //qDebug()<<data2[0]<<" "<<data2[1]<<"\n";
     }
     DestroyBuildPointer destroyBuild;
-    if (map.getCube(data[0],data[1],data[2]))
+    if (map->getCube(data[0],data[1],data[2]))
     {
-        destroyBuild.destroy = map.getCube(data[0],data[1],data[2])->getTriangle(Type(data2[0]));
+        destroyBuild.destroy = map->getCube(data[0],data[1],data[2])->getTriangle(Type(data2[0]));
         destroyBuild.isDestroySeted = true;
 
         if ((data2[0] == 0 && data2[1] == 4)||(data2[0] == 1 && data2[1] == 4)||(data2[0] == 4 && data2[1] == 3)||(data2[0] == 5 && data2[1] == 3))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::yUp);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::yUp);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::yUp;
         }
         if ((data2[0] == 1 && data2[1] == 2)||(data2[0] == 0 && data2[1] == 2)||(data2[0] == 5 && data2[1] == 5)||(data2[0] == 4 && data2[1] == 5))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::yDown);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::yDown);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::yDown;
         }
         if ((data2[0] == 4 && data2[1] == 2)||(data2[0] == 5 && data2[1] == 2)||(data2[0] == 2 && data2[1] == 2)||(data2[0] == 3 && data2[1] == 2))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::xDown);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::xDown);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::xDown;
         }
         if ((data2[0] == 2 && data2[1] == 4)||(data2[0] == 3 && data2[1] == 4)||(data2[0] == 5 && data2[1] == 4)||(data2[0] == 4 && data2[1] == 4))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::xUp);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::xUp);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::xUp;
         }
         if ((data2[0] == 2 && data2[1] == 5)||(data2[0] == 1 && data2[1] == 5)||(data2[0] == 3 && data2[1] == 5)||(data2[0] == 0 && data2[1] == 5))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::zDown);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::zDown);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::zDown;
         }
         if ((data2[0] == 2 && data2[1] == 3)||(data2[0] == 3 && data2[1] == 3)||(data2[0] == 0 && data2[1] == 3)||(data2[0] == 1 && data2[1] == 3))
         {
-             destroyBuild.build = map.getCube(data[0],data[1],data[2])->getTriangle(Type::zUp);
+             destroyBuild.build = map->getCube(data[0],data[1],data[2])->getTriangle(Type::zUp);
              destroyBuild.isBuildSeted = true;
              destroyBuild.buildType = Type::zUp;
         }
 
         if (data2[0] == 0 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0]-1,data[1],data[2]))
+            if (map->isInRange(data[0]-1,data[1],data[2]))
             {
-                if (!map.getCube(data[0]-1,data[1],data[2]))
-                    map.getCube(data[0]-1,data[1],data[2]) = std::make_shared<Cube>();
+                if (!map->getCube(data[0]-1,data[1],data[2]))
+                    map->getCube(data[0]-1,data[1],data[2]) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::xUp;
-                destroyBuild.build = map.getCube(data[0]-1,data[1],data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0]-1,data[1],data[2])->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
         if (data2[0] == 1 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0]+1,data[1],data[2]))
+            if (map->isInRange(data[0]+1,data[1],data[2]))
             {
-                if (!map.getCube(data[0]+1,data[1],data[2]))
-                    map.getCube(data[0]+1,data[1],data[2]) = std::make_shared<Cube>();
+                if (!map->getCube(data[0]+1,data[1],data[2]))
+                    map->getCube(data[0]+1,data[1],data[2]) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::xDown;
-                destroyBuild.build = map.getCube(data[0]+1,data[1],data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0]+1,data[1],data[2])->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
         if (data2[0] == 2 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0],data[1]-1,data[2]))
+            if (map->isInRange(data[0],data[1]-1,data[2]))
             {
-                if (!map.getCube(data[0],data[1]-1,data[2]))
-                    map.getCube(data[0],data[1]-1,data[2]) = std::make_shared<Cube>();
+                if (!map->getCube(data[0],data[1]-1,data[2]))
+                    map->getCube(data[0],data[1]-1,data[2]) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::yUp;
-                destroyBuild.build = map.getCube(data[0],data[1]-1,data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0],data[1]-1,data[2])->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
         if (data2[0] == 3 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0],data[1]+1,data[2]))
+            if (map->isInRange(data[0],data[1]+1,data[2]))
             {
-                if (!map.getCube(data[0],data[1]+1,data[2]))
-                    map.getCube(data[0],data[1]+1,data[2]) = std::make_shared<Cube>();
+                if (!map->getCube(data[0],data[1]+1,data[2]))
+                    map->getCube(data[0],data[1]+1,data[2]) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::yDown;
-                destroyBuild.build = map.getCube(data[0],data[1]+1,data[2])->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0],data[1]+1,data[2])->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
         if (data2[0] == 4 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0],data[1],data[2]-1))
+            if (map->isInRange(data[0],data[1],data[2]-1))
             {
-                if (!map.getCube(data[0],data[1],data[2]-1))
-                    map.getCube(data[0],data[1],data[2]-1) = std::make_shared<Cube>();
+                if (!map->getCube(data[0],data[1],data[2]-1))
+                    map->getCube(data[0],data[1],data[2]-1) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::zUp;
-                destroyBuild.build = map.getCube(data[0],data[1],data[2]-1)->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0],data[1],data[2]-1)->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
         if (data2[0] == 5 && (data2[1] == 0 || data2[1] == 1))
         {
-            if (map.isInRange(data[0],data[1],data[2]+1))
+            if (map->isInRange(data[0],data[1],data[2]+1))
             {
-                if (!map.getCube(data[0],data[1],data[2]+1))
-                    map.getCube(data[0],data[1],data[2]+1) = std::make_shared<Cube>();
+                if (!map->getCube(data[0],data[1],data[2]+1))
+                    map->getCube(data[0],data[1],data[2]+1) = std::make_shared<Cube>();
                 destroyBuild.buildType = Type::zDown;
-                destroyBuild.build = map.getCube(data[0],data[1],data[2]+1)->getTriangle(destroyBuild.buildType);
+                destroyBuild.build = map->getCube(data[0],data[1],data[2]+1)->getTriangle(destroyBuild.buildType);
                 destroyBuild.isBuildSeted = true;
             }
         }
@@ -236,8 +244,13 @@ void COpenGlWidget::simpleDraw()
     m_program->bind();
     m_program->setUniformValue("perspective", camera.getPerspective());
     m_program->setUniformValue("view", camera.getView());
+    m_program->setUniformValue("sunPos", QVector3D(5,3,5));
+    m_program->setUniformValue("cameraPos", camera.getPos());
 
-    map.draw(m_program,this);
+
+    map->draw(m_program,this);
+    gamebar->draw(m_program, this, camera);
+
 
     m_program->release();
 }

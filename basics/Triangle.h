@@ -24,10 +24,14 @@ class Triangle final
 {
 public:
     Triangle(const Type& _type, size_t ID);
-    ~Triangle() = default;
+    ~Triangle();
     void draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
     void drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f);
     void drawCalibratingTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f, QVector3D color);
+    const Shard* getDataMesh()
+    {
+        return mesh.data();
+    }
 private:
     size_t triangleID;
     Type type;
@@ -38,6 +42,7 @@ private:
 
     void generateMesh();
     void generateTextureCoods();
+    void generateNormals();
 };
 
 

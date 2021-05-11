@@ -15,6 +15,7 @@
 
 #include "basics/Camera.h"
 #include "basics/DestroyBuildPointer.h"
+#include "basics/GameBar.h"
 #include <basics/Map.h>
 
 class COpenGlWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -33,7 +34,7 @@ public:
     {
         if (event->type() == QEvent::Type::KeyRelease)
         {
-            keyBoard[event->key()] = false;
+            keyBoard[event->nativeVirtualKey()] = false;
         }
     }
 
@@ -54,6 +55,18 @@ public:
         mouse[e->button()] = false;
     }
 
+    void wheelEvent(QWheelEvent *event) override
+    {
+        if (event->angleDelta().y()>0)
+        {
+            gamebar->previousItem();
+        }
+        if (event->angleDelta().y()<0)
+        {
+            gamebar->nextItem();
+        }
+    }
+
     void initializeGL() override;
     void paintGL() override;
     void customInit();
@@ -64,8 +77,10 @@ public:
     void simpleDraw();
     void drawBlock(std::array<unsigned char,4> ID);
 
-    COpenGlWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()):QOpenGLWidget(parent,f), timer(new QTimer(this)), map(30,30,30)
+    COpenGlWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags()):QOpenGLWidget(parent,f), timer(new QTimer(this))
     {
+        gamebar = std::make_shared<GameBar>();
+        map = std::make_shared<Map>(30,30,30);
         QCursor::setPos(1920/2,1080/2);
         keyBoard.resize(1000);
         mouse.resize(100);
@@ -85,8 +100,10 @@ private:
     int m_frame = 0;
     QTimer* timer = nullptr;
 
-    Map map;
+    std::shared_ptr<Map> map;
     Camera camera;
+    std::shared_ptr<GameBar> gamebar;
+
     std::vector<bool> keyBoard;
     std::vector<bool> mouse;
 

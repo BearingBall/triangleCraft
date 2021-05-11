@@ -23,10 +23,12 @@ HEADERS += \
     basics/Camera.h \
     basics/Cube.h \
     basics/DestroyBuildPointer.h \
+    basics/GameBar.h \
     basics/Map.h \
     basics/MeshShard.h \
     basics/Triangle.h \
     mainwindow.h \
+    somethingFromC++17.h \
     widget/COpenGlWidget.h
 
 FORMS += \

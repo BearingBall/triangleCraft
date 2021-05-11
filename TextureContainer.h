@@ -14,7 +14,7 @@ public:
       return me;
   }
   std::vector<std::shared_ptr<QOpenGLTexture>> textures;
-
+  std::vector<std::shared_ptr<QOpenGLTexture>> normalMaps;
 
 
 
@@ -22,7 +22,13 @@ private:
   TextureContainer()
   {
       textures.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\grass.jpg")));
+      normalMaps.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\grassNormal.png")));
       textures.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\cobblestoneblock.png")));
+      normalMaps.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\cobblestoneblockNormal.png")));
+      textures.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\barFrame.jpg")));
+      normalMaps.emplace_back(std::make_shared<QOpenGLTexture>(QImage("C:\\Users\\Public\\Documents\\triangleCraft\\textures\\barFrameNormal.png")));
+
+
       std::for_each(textures.begin(),textures.end(),[](std::shared_ptr<QOpenGLTexture>& current)
       {
           current->setMinificationFilter(QOpenGLTexture::Nearest);

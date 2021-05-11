@@ -50,13 +50,15 @@ inline void Map::draw(QOpenGLShaderProgram *m_program, QOpenGLFunctions* f)
             {
                 if (getCube(i,j,k))
                 {
-                    QMatrix4x4 matrix;
-                    matrix.translate(i,j,k);
-                    m_program->setUniformValue("translate", matrix);
+                    QMatrix4x4 rot;
+                    rot.rotate(0,0,1,0);
+                    m_program->setUniformValue("rotate", rot);
+                    QMatrix4x4 trans;
+                    trans.translate(i,j,k);
+                    m_program->setUniformValue("translate", trans);
                     getCube(i,j,k)->draw(m_program, f);
                 }
             }
-    m_program->release();
 }
 
 inline void Map::drawWithoutTexture(QOpenGLShaderProgram *m_program, QOpenGLFunctions *f)
